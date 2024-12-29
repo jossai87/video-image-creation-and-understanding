@@ -1,4 +1,3 @@
-
 import base64
 import boto3
 import json
@@ -22,11 +21,12 @@ def upload_file_to_s3(file_content, bucket_name, file_name, content_type):
         return f"Error uploading file to S3: {str(e)}"
 
 
-def compress_video(video_data, max_size_mb=25, chunk_duration=30):
+def video_compression(video_data, max_size_mb=25, chunk_duration=30):
     """
     Compress or chunk video data if it exceeds size limit.
     """
     try:
+        
         current_size_mb = len(video_data) / (1024 * 1024)
         if current_size_mb <= max_size_mb:
             return video_data, True
@@ -75,6 +75,16 @@ def compress_video(video_data, max_size_mb=25, chunk_duration=30):
         print(f"Error in video processing: {str(e)}")
         return None, False
 
+# Define and set up the compression function
+def setup_compression():
+    global video_compression
+    try:
+        print("Successfully imported video compression function")
+    except ImportError as e:
+        print(f"Import error: {e}. Using fallback compression.")
+        def fallback_compress(video_data, target_size_mb=24):
+            return video_data, False
+        return fallback_compress
 
 def analyze_video_with_nova(bucket_name, video_filename, prompt="Analyze and describe this video content", model_id="us.amazon.nova-lite-v1:0"):
     """
@@ -87,7 +97,7 @@ def analyze_video_with_nova(bucket_name, video_filename, prompt="Analyze and des
         binary_data = video_object['Body'].read()
         
         # Compress video if needed
-        compressed_data, compression_success = compress_video(binary_data)
+        compressed_data, compression_success = video_compression(binary_data)
         
         # Check compression result
         if not compression_success:

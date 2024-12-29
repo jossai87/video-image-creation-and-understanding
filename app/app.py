@@ -1,38 +1,16 @@
 import os
 import sys
-
-# Add video_analytics_lib to the path immediately
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(current_dir)
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
-# Import dependencies
 import base64
 from PIL import Image
 from io import BytesIO
 import boto3
 import time
 
-# Global variable for compress_video function
-compress_video = None
-
-# Define and set up the compression function
-def setup_compression():
-    global compress_video
-    try:
-        import cv2
-        from video_analytics_lib.video_compression import compress_video as cv_compress
-        print("Successfully imported video compression function")
-        return cv_compress
-    except ImportError as e:
-        print(f"Import error: {e}. Using fallback compression.")
-        def fallback_compress(video_data, target_size_mb=24):
-            return video_data, False
-        return fallback_compress
-
-# Set up the compression function before Streamlit
-compress_video = setup_compression()
+# Add video_analytics_lib to the path immediately
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 # Initialize Streamlit
 import streamlit as st
@@ -42,13 +20,14 @@ bedrock_client = boto3.client("bedrock-runtime", region_name="us-east-1")
 # Add the parent directory (project-folder/) to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+#Tools
 import tools.image_background_lib.image_background_lib as bg_glib
 import tools.image_understanding_lib.image_understanding_lib as ui_glib
 import tools.image_extension_lib.image_extension_lib as img_extension_glib
 import tools.subtitle_translation_lib.subtitle_translation_lib as sub_tran_glib
 import tools.image_generation_lib.image_generation_lib as img_gen_glib
 import tools.object_replace_remove_lib.object_replace_remove_lib as rplce_rmv_glib
-import tools.video_analytics_lib.video_analytics_lib as video_analytics_lib
+import tools.video_analytics_lib.video_analytics_lib as vid_analytic_lib
 import tools.image_to_video_lib.image_to_video_lib as img_to_video_glib
 import tools.text_to_video_lib.text_to_video_lib as txt_to_video_glib
 import tools.background_removal_lib.background_removal_lib as bg_removal_glib
@@ -58,6 +37,9 @@ import tools.color_guided_lib.color_guided_lib as clr_guided_glib
 
 # S3 Client initialization
 bucket_name = "demo-portal-videos-jossai-east1"
+
+# Global variable for video_compression function
+vid_analytic_lib.video_compression = None
 
 
 # Load custom CSS
@@ -166,7 +148,7 @@ with tab1:
         }
 
         image_options_dict = {
-            "Cosmetic": "loreal_images/aspect_resized_revitalift.jpg",
+            "Cosmetic": "images/aspect_resized_revitalift.jpg",
             "Food": "images/food.jpg",
             "People": "images/people.jpg",
             "Person and cat": "images/person_and_cat.jpg",
@@ -437,7 +419,7 @@ with tab1:
                     elif isinstance(identified_items, list):
                         mask_prompt = " ".join(identified_items)
             else:
-                st.image("loreal_images/aspect_resized_revitalift.jpg", caption="Example Image")
+                st.image("images/aspect_resized_revitalift.jpg", caption="Example Image")
                 st.warning("Please upload an image to generate a result.")
         
         with col2:
@@ -783,7 +765,7 @@ with tab1:
                 video_filename = uploaded_video.name
                 content_type = "video/mp4"
                 # Compress video before upload
-                compressed_video_data, compression_success = compress_video(uploaded_video.getvalue())
+                compressed_video_data, compression_success = vid_analytic_lib.setup_compression()(uploaded_video.getvalue())
                 if compression_success:
                     upload_status = sub_tran_glib.upload_file_to_s3(compressed_video_data, bucket_name, video_filename, content_type)
                 else:
