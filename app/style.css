@@ -1,0 +1,61 @@
+/* General App Styles */
+body {
+    background-color: #f5f5f5; /* Light background */
+    font-family: 'Arial', sans-serif;
+}
+
+.stButton > button {
+    background-color: #008CBA; /* Primary button color */
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 10px 24px;
+    transition: background-color 0.3s ease;
+}
+
+.stButton > button:hover {
+    background-color: #005f7a; /* Hover state */
+}
+
+/* Customizing section headers */
+h1, h2, h3 {
+    color: #333333;
+}
+
+.stTabs [role="tablist"] button {
+    background-color: #dddddd;
+    border-radius: 8px 8px 0 0;
+    color: #333;
+    font-weight: bold;
+    padding: 10px 20px;
+}
+
+.stTabs [role="tablist"] button[aria-selected="true"] {
+    background-color: #008CBA;
+    color: white;
+}
+
+.stImage {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 5px;
+    background-color: white;
+    margin-bottom: 20px;
+}
+
+.stFileUploader {
+    padding-top: 15px;
+}
+
+.stTextInput, .stSelectbox, .stTextarea, .stNumberInput {
+    margin-bottom: 15px;
+}
+
+.stVideo {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.stButton > button {
+    margin-top: 20px;
+}
