@@ -27,7 +27,7 @@ import tools.image_extension_lib.image_extension_lib as img_extension_glib
 import tools.subtitle_translation_lib.subtitle_translation_lib as sub_tran_glib
 import tools.image_generation_lib.image_generation_lib as img_gen_glib
 import tools.object_replace_remove_lib.object_replace_remove_lib as rplce_rmv_glib
-import tools.video_analytics_lib.video_analytics_lib as vid_analytic_lib
+import tools.video_analytics_lib.video_analytics_lib as vid_analytics_lib
 import tools.image_to_video_lib.image_to_video_lib as img_to_video_glib
 import tools.text_to_video_lib.text_to_video_lib as txt_to_video_glib
 import tools.background_removal_lib.background_removal_lib as bg_removal_glib
@@ -39,7 +39,7 @@ import tools.color_guided_lib.color_guided_lib as clr_guided_glib
 bucket_name = "demo-portal-videos-jossai-east1"
 
 # Global variable for video_compression function
-vid_analytic_lib.video_compression = None
+vid_analytics_lib.video_compression = None
 
 
 # Load custom CSS
@@ -765,7 +765,7 @@ with tab1:
                 video_filename = uploaded_video.name
                 content_type = "video/mp4"
                 # Compress video before upload
-                compressed_video_data, compression_success = vid_analytic_lib.setup_compression()(uploaded_video.getvalue())
+                compressed_video_data, compression_success = vid_analytics_lib.setup_compression()(uploaded_video.getvalue())
                 if compression_success:
                     upload_status = sub_tran_glib.upload_file_to_s3(compressed_video_data, bucket_name, video_filename, content_type)
                 else:
@@ -994,7 +994,7 @@ with tab1:
                 st.video(uploaded_video)
                 video_filename = uploaded_video.name
                 content_type = "video/mp4"
-                upload_status = video_analytics_lib.upload_file_to_s3(
+                upload_status = vid_analytics_lib.upload_file_to_s3(
                     uploaded_video.getvalue(),
                     bucket_name,
                     video_filename,
@@ -1048,7 +1048,7 @@ with tab1:
                         progress_text = "Analysis in progress. Please wait..."
                         progress_bar = st.progress(0, text=progress_text)
                         
-                        analysis_result = video_analytics_lib.analyze_video_with_nova(
+                        analysis_result = vid_analytics_lib.analyze_video_with_nova(
                             bucket_name,
                             video_filename_input,
                             analysis_prompt,
@@ -1086,7 +1086,7 @@ with tab1:
                 if listen_button:
                     with st.spinner("Generating audio with Amazon Polly..."):
                         try:
-                            audio_result = video_analytics_lib.generate_audio(
+                            audio_result = vid_analytics_lib.generate_audio(
                                 bucket_name,
                                 st.session_state['current_analysis'],
                                 voice_options[selected_voice]
